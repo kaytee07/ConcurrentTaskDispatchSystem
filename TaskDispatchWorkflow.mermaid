@@ -1,0 +1,53 @@
+stateDiagram-v2
+    direction TB
+    title ConcurQueue: Concurrent Task Dispatch Workflow
+
+    [*] --> StartSystem
+    StartSystem --> Fork
+
+    state Fork <<fork>>
+    Fork --> ProducerThreads
+    Fork --> SharedQueue
+    Fork --> ConsumerPool
+
+    state ProducerThreads {
+        StartProducers --> GenerateTask
+        GenerateTask --> SubmitTask
+        note right of SubmitTask: Synchronization Point 1\n(taskQueue.put(task))
+        SubmitTask --> MoreTasks
+        MoreTasks --> GenerateTask: yes
+        MoreTasks --> AllProducersFinished: no
+    }
+
+    state SharedQueue {
+        [*] --> CheckRunning
+        CheckRunning --> CheckEmpty: yes
+        CheckEmpty --> ConsumersWait: yes
+        CheckEmpty --> DispatchTask: no
+        note left of DispatchTask: Synchronization Point 2\n(taskQueue.take())
+        DispatchTask --> CheckRunning
+        ConsumersWait --> CheckRunning
+        CheckRunning --> [*]: no
+    }
+
+    state ConsumerPool {
+        StartExecutorService --> ConsumerLoop
+        ConsumerLoop --> TakeTask
+        TakeTask --> UpdateProcessing
+        UpdateProcessing --> ProcessTask
+        ProcessTask --> CheckSuccess
+        CheckSuccess --> UpdateCompleted: yes
+        note right of UpdateCompleted: Synchronization Point 3\n(atomicTaskProcessedCount.incrementAndGet())
+        UpdateCompleted --> ConsumerLoop
+        CheckSuccess --> CheckRetry: no
+        CheckRetry --> IncrementRetry: no
+        IncrementRetry --> RequeueTask
+        RequeueTask --> SharedQueue: via DispatchTask
+        CheckRetry --> UpdateFailed: yes
+        UpdateFailed --> ConsumerLoop
+    }
+
+    AllProducersFinished --> WaitCompletion
+    ConsumerLoop --> WaitCompletion: when stopping
+    WaitCompletion --> GracefulShutdown
+    GracefulShutdown --> [*]
