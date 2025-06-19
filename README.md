@@ -67,7 +67,7 @@ You can compile and run this project from any standard Java IDE or via the comma
 
     To run directly after `mvn install`:
     ```bash
-    java -cp target/classes com.novatech.concurqueue.main.ConcurQueueLab
+    java -cp target/classes taylor.project.main.ConcurQueueLab
     ```
 
 ### Demonstrating the Race Condition
