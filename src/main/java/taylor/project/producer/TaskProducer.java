@@ -14,7 +14,7 @@ public class TaskProducer implements Runnable {
     private final int numberOfTasks;
     private final String producerName;
 
-    public TaskProducer(TaskQueue taskQueue, String producerName, int numberOfTasks) {
+    public TaskProducer(String producerName, int numberOfTasks) {
         this.taskQueue = TaskQueue.getInstance();
         this.producerName = producerName;
         this.numberOfTasks = numberOfTasks;
@@ -23,7 +23,7 @@ public class TaskProducer implements Runnable {
 
     @Override
     public void run() {
-        log.info("Producer [%s] started.{}", producerName);
+        log.info("Producer [{}] started.\n", producerName);
         for (int i = 0; i < numberOfTasks; i++) {
             try {
                 int priority = ThreadLocalRandom.current().nextInt(1, 11);
@@ -32,10 +32,10 @@ public class TaskProducer implements Runnable {
                 Thread.sleep(ThreadLocalRandom.current().nextInt(500, 2000));
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                log.warn("Producer [%s] was interrupted.{}", producerName);
+                log.warn("Producer [{}] was interrupted.\n", producerName);
                 break;
             }
         }
-        log.info("Producer [%s] finished producing tasks.{}", producerName);
+        log.info("Producer [{}] finished producing tasks.\n", producerName);
     }
 }

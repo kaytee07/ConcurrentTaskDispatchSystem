@@ -1,6 +1,8 @@
 package taylor.project.queue;
 
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import taylor.project.model.Task;
 import taylor.project.model.TaskStatus;
@@ -11,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.PriorityBlockingQueue;
 
 @Slf4j
+@Data
 public class TaskQueue {
     private static final TaskQueue INSTANCE = new TaskQueue();
 
@@ -20,6 +23,11 @@ public class TaskQueue {
     private TaskQueue() {
         this.queue = new PriorityBlockingQueue<>();
         this.taskStatusMap = new ConcurrentHashMap<>();
+    }
+
+    public void resetForTest() {
+        queue.clear();
+        taskStatusMap.clear();
     }
 
     public static TaskQueue getInstance() {
