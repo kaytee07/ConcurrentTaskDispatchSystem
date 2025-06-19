@@ -17,8 +17,6 @@ class TaskTest {
         Task highPriorityTask = new Task("High Prio", "Payload", 8);
         Task lowPriorityTask = new Task("Low Prio", "Payload", 4);
 
-        // compareTo should return a negative integer if "this" object is less than the specified object.
-        // In our case, lower priority is "less than" higher priority.
         assertThat(highPriorityTask.compareTo(lowPriorityTask)).isLessThan(0);
         assertThat(lowPriorityTask.compareTo(highPriorityTask)).isGreaterThan(0);
     }
@@ -40,10 +38,10 @@ class TaskTest {
 
         List<Task> tasks = new ArrayList<>(List.of(lowPriorityTask, highPriorityTask, mediumPriorityTask));
 
-        // Act
+
         Collections.sort(tasks);
 
-        // Assert
+
         assertThat(tasks).containsExactly(highPriorityTask, mediumPriorityTask, lowPriorityTask);
     }
 

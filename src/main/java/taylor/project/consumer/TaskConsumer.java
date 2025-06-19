@@ -47,10 +47,7 @@ public class TaskConsumer implements Runnable {
             taskQueue.updateTaskStatus(task.getId(), TaskStatus.COMPLETED);
             log.info("COMPLETED: {} by Thread [{}]\n", task, threadName);
 
-            // Unsafe shared counter demonstration (before fix)
-            // ConcurQueueLab.taskProcessedCount++;
 
-            // FIX: Using AtomicInteger
             ConcurQueueLab.atomicTaskProcessedCount.incrementAndGet();
 
         } catch (InterruptedException e) {

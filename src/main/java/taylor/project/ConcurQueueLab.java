@@ -1,6 +1,7 @@
 package taylor.project;
 
 
+import lombok.extern.slf4j.Slf4j;
 import taylor.project.consumer.TaskConsumer;
 import taylor.project.monitor.SystemMonitor;
 import taylor.project.producer.TaskProducer;
@@ -11,12 +12,13 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Slf4j
 public class ConcurQueueLab {
 
     public static AtomicInteger atomicTaskProcessedCount = new AtomicInteger(0);
 
     public static void main(String[] args) throws InterruptedException {
-        System.out.println("Starting ConcurQueue System...");
+        log.info("Starting ConcurQueue System...");
 
         final int NUM_PRODUCERS = 3;
         final int NUM_CONSUMERS = 5;
@@ -41,30 +43,30 @@ public class ConcurQueueLab {
 
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.out.println("Shutdown hook initiated...");
+            log.info("Shutdown hook initiated...");
             shutdown(consumerPool);
             monitorThread.interrupt();
-            System.out.println("ConcurQueue System shut down.");
+            log.info("ConcurQueue System shut down.");
         }));
 
         for (Thread producerThread : producerThreads) {
             producerThread.join();
         }
 
-        System.out.println("All producers have finished submitting tasks.");
+        log.info("All producers have finished submitting tasks.");
 
         while (atomicTaskProcessedCount.get() < TOTAL_EXPECTED_TASKS) {
-            System.out.printf("Main Thread: Waiting for tasks to complete. Processed: %d/%d\n",
+            log.info("Main Thread: Waiting for tasks to complete. Processed: {}/{}\n",
                     atomicTaskProcessedCount.get(), TOTAL_EXPECTED_TASKS);
             TimeUnit.SECONDS.sleep(2);
         }
 
-        System.out.println("All tasks have been processed. Shutting down the system.");
+        log.info("All tasks have been processed. Shutting down the system.");
         shutdown(consumerPool);
         monitorThread.interrupt();
 
-        System.out.printf("Final Processed Count: %d\n", atomicTaskProcessedCount.get());
-        System.out.println("System execution finished.");
+        log.info("Final Processed Count: {}\n", atomicTaskProcessedCount.get());
+        log.info("System execution finished.");
     }
 
     private static void shutdown(ExecutorService executorService) {

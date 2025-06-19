@@ -22,7 +22,7 @@ class ProducerConsumerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Reset shared state before each integration test
+
         taskQueue = TaskQueue.getInstance();
         taskQueue.resetForTest();
         ConcurQueueLab.atomicTaskProcessedCount = new AtomicInteger(0);
@@ -30,7 +30,7 @@ class ProducerConsumerIntegrationTest {
 
     @Test
     void fullWorkflow_shouldProcessAllTasksSubmittedByProducers() throws InterruptedException {
-        // Arrange
+
         final int numProducers = 2;
         final int tasksPerProducer = 5;
         final int totalTasks = numProducers * tasksPerProducer;
@@ -46,29 +46,25 @@ class ProducerConsumerIntegrationTest {
             producerThreads[i] = new Thread(new TaskProducer("TestProducer-" + i, tasksPerProducer));
         }
 
-        // Act
         for (Thread producerThread : producerThreads) {
             producerThread.start();
         }
 
-        // Wait for producers to finish submitting
+
         for (Thread producerThread : producerThreads) {
             producerThread.join();
         }
-
-        // Assert
-        // Use Awaitility to wait until all tasks are processed, avoiding flaky sleeps
         await().atMost(15, SECONDS).until(() -> ConcurQueueLab.atomicTaskProcessedCount.get() == totalTasks);
 
-        // Shutdown the consumer pool gracefully
+
         consumerPool.shutdown();
         consumerPool.awaitTermination(5, SECONDS);
 
-        // Final assertions
+
         assertThat(ConcurQueueLab.atomicTaskProcessedCount.get()).isEqualTo(totalTasks);
         assertThat(taskQueue.getQueueSize()).isZero();
 
-        // Verify all tasks are marked as completed (assuming no failures in this test)
+
         long completedTasks = taskQueue.getTaskStatusMap().values().stream()
                 .filter(status -> status == TaskStatus.COMPLETED)
                 .count();
