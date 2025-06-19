@@ -21,14 +21,24 @@ public class SystemMonitor implements Runnable {
     public void run() {
         try {
             while (!Thread.currentThread().isInterrupted()) {
-                System.out.println("==================== SYSTEM MONITOR ====================");
-                System.out.printf("Queue Size: %d\n", taskQueue.getQueueSize());
-                System.out.printf("Active Threads: %d\n", executor.getActiveCount());
-                System.out.printf("Pool Size: %d\n", executor.getPoolSize());
-                System.out.printf("Completed Tasks : %d\n", ConcurQueueLab.atomicTaskProcessedCount.get());
-                System.out.println("========================================================");
+                synchronized (taskQueue) {
+                    log.info("""
+                ==================== SYSTEM MONITOR ====================
+                Queue Size: {}
+                Active Threads: {}
+                Pool Size: {}
+                Completed Tasks: {}
+                ========================================================
+                """,
+                            taskQueue.getQueueSize(),
+                            executor.getActiveCount(),
+                            executor.getPoolSize(),
+                            ConcurQueueLab.atomicTaskProcessedCount.get());
+                }
+
                 TimeUnit.SECONDS.sleep(5);
             }
+
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             System.out.println("System monitor was interrupted.");
