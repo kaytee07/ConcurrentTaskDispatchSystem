@@ -36,10 +36,10 @@ public class TaskConsumer implements Runnable {
         log.info("PROCESSING: {} by Thread [{}] at {}\n", task, threadName, Instant.now());
 
         try {
-            // Simulate variable processing time
+
             Thread.sleep(ThreadLocalRandom.current().nextInt(1000, 5000));
 
-            // Simulate a chance of failure for the retry mechanism
+
             if (ThreadLocalRandom.current().nextDouble() < 0.1 && task.getRetryCount() < 3) {
                 throw new RuntimeException("Simulated processing failure.");
             }

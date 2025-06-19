@@ -1,11 +1,9 @@
 package taylor.project.producer;
 
-import lombok.AllArgsConstructor;
+
 import lombok.extern.slf4j.Slf4j;
 import taylor.project.model.Task;
 import taylor.project.queue.TaskQueue;
-
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j

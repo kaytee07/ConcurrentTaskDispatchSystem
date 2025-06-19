@@ -1,0 +1,66 @@
+@startuml ConcurQueue_Workflow
+title ConcurQueue - Concurrent Task Dispatch Workflow
+
+start
+
+fork
+    :Start Producers;
+    repeat
+        :Generate Task with Priority;
+        :Submit Task to Queue;
+        note right
+            Synchronization Point 1:
+            `taskQueue.put(task)`
+            Blocks if queue is full
+            (for bounded queues)
+        end note
+    repeat while (More tasks to generate?) is (yes)
+    -> All producers finished;
+fork again
+
+    while (System is running?) is (yes)
+        if (Is Queue Empty?) then (yes)
+            :Consumers Wait (Blocking);
+        else (no)
+            :Dispatch Highest Priority Task;
+            note left
+                Synchronization Point 2:
+                `taskQueue.take()`
+                Blocks if queue is empty.
+                Core consumer sync point
+            end note
+        endif
+    endwhile
+fork again
+
+    :Start ExecutorService;
+    while (System is running?) is (yes)
+        :Take Task from Queue;
+        :Update Status to PROCESSING;
+        :Process Task (Simulate Work);
+        if (Processing Successful?) then (yes)
+            :Update Status to COMPLETED;
+            :Increment Processed Count;
+            note right
+                Synchronization Point 3:
+                `atomicTaskProcessedCount.incrementAndGet()`
+                Thread-safe counting
+                prevents race conditions
+            end note
+        else (no)
+            if (Retry Limit Reached?) then (no)
+                :Increment Retry Count;
+                :Re-queue Task for Retry;
+            else (yes)
+                :Update Status to FAILED;
+            endif
+        endif
+    endwhile
+end fork
+
+:Wait for producers to finish;
+:Wait for all tasks to be processed;
+:Initiate Graceful Shutdown;
+
+stop
+@enduml
