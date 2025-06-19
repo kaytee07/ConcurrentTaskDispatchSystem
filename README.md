@@ -80,7 +80,7 @@ To see the race condition in action:
 
 2.  **Modify `ConcurQueueLab.java`**:
     -   Comment out the `AtomicInteger` declaration.
-    -   Uncomment the `public static volatile int taskProcessedCount = 0;` declaration.
+    -   Uncommentt the `public static volatile int taskProcessedCount = 0;` declaration.
     -   Change the wait loop and final print statement to use `taskProcessedCount`.
 
 3.  **Re-compile and Run**: Follow the steps above. You will notice that the "Final Processed Count" is often less than the total expected number of tasks, demonstrating lost updates.
