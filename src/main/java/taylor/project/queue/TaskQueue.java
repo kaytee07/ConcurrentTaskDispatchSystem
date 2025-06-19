@@ -1,6 +1,7 @@
 package taylor.project.queue;
 
 
+import lombok.extern.slf4j.Slf4j;
 import taylor.project.model.Task;
 import taylor.project.model.TaskStatus;
 
@@ -9,6 +10,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.PriorityBlockingQueue;
 
+@Slf4j
 public class TaskQueue {
     private static final TaskQueue INSTANCE = new TaskQueue();
 
@@ -27,7 +29,7 @@ public class TaskQueue {
     public void submitTask(Task task) throws InterruptedException {
         queue.put(task);
         taskStatusMap.put(task.getId(), TaskStatus.SUBMITTED);
-        System.out.printf("SUBMITTED: %s\n", task);
+        log.info("SUBMITTED: {}\n", task);
     }
 
     public Task takeTask() throws InterruptedException {
