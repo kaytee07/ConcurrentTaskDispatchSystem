@@ -1,6 +1,7 @@
 package taylor.project.monitor;
 
 import lombok.extern.slf4j.Slf4j;
+import taylor.project.ConcurQueueLab;
 import taylor.project.queue.TaskQueue;
 
 import java.util.concurrent.ThreadPoolExecutor;
@@ -20,14 +21,17 @@ public class SystemMonitor implements Runnable {
     public void run() {
         try {
             while (!Thread.currentThread().isInterrupted()) {
-                log.info("==================== SYSTEM MONITOR ====================");
-                log.info(this.toString());
-                log.info("========================================================");
+                System.out.println("==================== SYSTEM MONITOR ====================");
+                System.out.printf("Queue Size: %d\n", taskQueue.getQueueSize());
+                System.out.printf("Active Threads: %d\n", executor.getActiveCount());
+                System.out.printf("Pool Size: %d\n", executor.getPoolSize());
+                System.out.printf("Completed Tasks : %d\n", ConcurQueueLab.atomicTaskProcessedCount.get());
+                System.out.println("========================================================");
                 TimeUnit.SECONDS.sleep(5);
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            log.warn("System monitor was interrupted.");
+            System.out.println("System monitor was interrupted.");
         }
     }
 }

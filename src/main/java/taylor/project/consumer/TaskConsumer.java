@@ -2,6 +2,7 @@ package taylor.project.consumer;
 
 
 import lombok.extern.slf4j.Slf4j;
+import taylor.project.ConcurQueueLab;
 import taylor.project.model.Task;
 import taylor.project.model.TaskStatus;
 import taylor.project.queue.TaskQueue;
@@ -32,7 +33,7 @@ public class TaskConsumer implements Runnable {
 
     private void processTask(Task task) {
         String threadName = Thread.currentThread().getName();
-        log.info("PROCESSING: {} by Thread [%s] at {}\n", task, threadName, Instant.now());
+        log.info("PROCESSING: {} by Thread [{}] at {}\n", task, threadName, Instant.now());
 
         try {
             // Simulate variable processing time
@@ -47,10 +48,10 @@ public class TaskConsumer implements Runnable {
             log.info("COMPLETED: {} by Thread [{}]\n", task, threadName);
 
             // Unsafe shared counter demonstration (before fix)
-            // ConcurQueueManager.taskProcessedCount++;
+            // ConcurQueueLab.taskProcessedCount++;
 
             // FIX: Using AtomicInteger
-            ConcurQueueManager.atomicTaskProcessedCount.incrementAndGet();
+            ConcurQueueLab.atomicTaskProcessedCount.incrementAndGet();
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
